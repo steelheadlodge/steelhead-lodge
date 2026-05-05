@@ -435,19 +435,7 @@ footer{background:#060f16;color:rgba(255,255,255,0.5);padding:3rem 2rem 2rem;}
           </div>
         </div>
 
-        <!-- YOUR OWN QUICK NOTE -->
-        <div style="background:rgba(212,168,67,0.06);border:1px solid rgba(212,168,67,0.25);border-radius:4px;padding:1.25rem;margin-bottom:1rem;">
-          <div style="display:flex;align-items:center;gap:0.5rem;margin-bottom:0.75rem;">
-            <span style="font-size:1.2rem;">📍</span>
-            <div>
-              <div style="font-family:'Oswald',sans-serif;color:var(--gold);font-size:0.8rem;letter-spacing:0.05em;text-transform:uppercase;">From Our Guides</div>
-              <div id="lodge-report-date" style="font-family:'Oswald',sans-serif;color:rgba(255,255,255,0.35);font-size:0.62rem;letter-spacing:0.08em;text-transform:uppercase;"></div>
-            </div>
-          </div>
-          <p id="lodge-report-text" style="font-family:'Crimson Pro',serif;font-size:1rem;color:rgba(255,255,255,0.8);line-height:1.75;font-style:italic;">
-            "Kings stacking up at the fly zone and Compactor Pool — hot pink eggs and chartreuse glo-bugs working best. Excellent conditions this week. Call us to book your guided trip!"
-          </p>
-        </div>
+
 
         <!-- RIVERREPORTS LIVE FLOW WIDGET -->
         <div style="background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.08);border-radius:4px;overflow:hidden;margin-bottom:1rem;">
@@ -525,42 +513,38 @@ footer{background:#060f16;color:rgba(255,255,255,0.5);padding:3rem 2rem 2rem;}
 // Salmon River at Pineville gauge: 04249000
 async function loadUSGSData() {
   try {
-    // USGS WaterWatch JSON API — supports CORS from browsers
-    const urls = [
-      // Primary: USGS instantaneous values REST API
+    // USGS Instantaneous Values API - works from browsers with CORS
+    // Trying multiple URL formats for best compatibility
+    const endpoints = [
       'https://waterservices.usgs.gov/nwis/iv/?format=json&sites=04249000&parameterCd=00060,00065,00010&siteStatus=all',
-      // Fallback: USGS via different endpoint
-      'https://nwis.waterservices.usgs.gov/nwis/iv/?format=json&sites=04249000&parameterCd=00060,00065&siteStatus=all'
+      'https://waterservices.usgs.gov/nwis/iv/?format=json&sites=04249000&parameterCd=00060,00065&siteStatus=all',
+      'https://waterservices.usgs.gov/nwis/iv/?format=json&sites=04249000&parameterCd=00060&siteStatus=all'
     ];
 
     let data = null;
-    
-    // Try direct USGS endpoints first (work in most browsers)
-    const directUrls = [
-      'https://waterservices.usgs.gov/nwis/iv/?format=json&sites=04249000&parameterCd=00060,00065,00010&siteStatus=all',
-      'https://nwis.waterservices.usgs.gov/nwis/iv/?format=json&sites=04249000&parameterCd=00060,00065&siteStatus=all'
-    ];
-    
-    for (const url of directUrls) {
+    let lastError = null;
+
+    for (const url of endpoints) {
       try {
-        const response = await fetch(url, { mode: 'cors' });
+        const ctrl = new AbortController();
+        const timeout = setTimeout(() => ctrl.abort(), 8000); // 8 second timeout
+        const response = await fetch(url, {
+          signal: ctrl.signal,
+          cache: 'no-cache'
+        });
+        clearTimeout(timeout);
         if (response.ok) {
           data = await response.json();
-          break;
+          if (data && data.value && data.value.timeSeries) break;
+          data = null;
         }
-      } catch(e) { continue; }
+      } catch(e) {
+        lastError = e;
+        continue;
+      }
     }
 
-    // Fallback: use corsproxy.io which is free and reliable
-    if (!data) {
-      try {
-        const proxyUrl = 'https://corsproxy.io/?' + encodeURIComponent('https://waterservices.usgs.gov/nwis/iv/?format=json&sites=04249000&parameterCd=00060,00065,00010&siteStatus=all');
-        const response = await fetch(proxyUrl);
-        if (response.ok) data = await response.json();
-      } catch(e) {}
-    }
-
-    if (!data) throw new Error('All endpoints failed');
+    if (!data) throw new Error(lastError || 'No data returned');
 
     const series = data.value.timeSeries;
     let cfs = null, gaugeHt = null, tempC = null;
@@ -606,24 +590,26 @@ async function loadUSGSData() {
     const el = document.getElementById('cfs-value');
     if (el) el.textContent = 'N/A';
     
+    // Show helpful fallback status
     const tubingBox = document.getElementById('tubing-status-box');
     const tubingStatus = document.getElementById('tubing-status');
     const tubingDesc = document.getElementById('tubing-desc');
     if (tubingBox && tubingStatus) {
-      tubingBox.style.borderColor = 'rgba(255,255,255,0.2)';
-      tubingStatus.textContent = 'Check SafeWaters.com';
+      tubingBox.style.borderColor = 'rgba(212,168,67,0.3)';
+      tubingBox.style.background = 'rgba(212,168,67,0.05)';
+      tubingStatus.textContent = 'Check Current Flow';
       tubingStatus.style.color = 'var(--gold)';
-      if (tubingDesc) tubingDesc.innerHTML = 'Live gauge data temporarily unavailable. Check current conditions at <a href="https://www.safewaters.com/facility/lighthouse-hill" target="_blank" style="color:var(--gold)">SafeWaters.com</a> or call <a href="tel:3152984371" style="color:var(--gold)">(315) 298-4371</a>.';
+      if (tubingDesc) tubingDesc.innerHTML = 'Visit <a href="https://www.safewaters.com/facility/lighthouse-hill" target="_blank" style="color:var(--gold);">SafeWaters.com</a> for current dam release · <a href="https://waterdata.usgs.gov/monitoring-location/04249000/" target="_blank" style="color:var(--gold);">USGS Pineville Gauge</a> for live CFS · Or call us at <a href="tel:3152984371" style="color:var(--gold);">(315) 298-4371</a>';
     }
-    
+    const fishingBox = document.getElementById('fishing-status-box');
     const fishingStatus = document.getElementById('fishing-status');
     const fishingDesc = document.getElementById('fishing-desc');
-    if (fishingStatus) {
-      fishingStatus.textContent = 'Check Current Conditions';
+    if (fishingBox && fishingStatus) {
+      fishingBox.style.borderColor = 'rgba(212,168,67,0.3)';
+      fishingBox.style.background = 'rgba(212,168,67,0.05)';
+      fishingStatus.textContent = 'See Today's Report';
       fishingStatus.style.color = 'var(--gold)';
-    }
-    if (fishingDesc) {
-      fishingDesc.innerHTML = 'For current fishing conditions visit <a href="https://douglastonsalmonrun.com/fishing-reports/" target="_blank" style="color:var(--gold)">DSR Daily Report</a> or <a href="https://fishingreports.orvis.com/northeast/new-york/salmon-river" target="_blank" style="color:var(--gold)">Orvis Report</a>.';
+      if (fishingDesc) fishingDesc.innerHTML = 'Read the <a href="https://douglastonsalmonrun.com/fishing-reports/" target="_blank" style="color:var(--gold);">DSR Daily Fishing Report</a> or <a href="https://fishingreports.orvis.com/northeast/new-york/salmon-river" target="_blank" style="color:var(--gold);">Orvis Salmon River Report</a> for current conditions.';
     }
   }
 }
@@ -720,12 +706,9 @@ function updateFishingStatus(cfs) {
   }
 }
 
-// ─── SET REPORT DATES ─────────────────────────────────────────
+// ─── SET REPORT DATE ──────────────────────────────────────────
 const reportDate = new Date();
 const dateStr = reportDate.toLocaleDateString('en-US', {month:'long',day:'numeric',year:'numeric'});
-if(document.getElementById('lodge-report-date')) {
-  document.getElementById('lodge-report-date').textContent = 'Updated ' + dateStr;
-}
 
 // ─── HIGHLIGHT UPCOMING WHITEWATER DATES ─────────────────────
 const today = new Date();
