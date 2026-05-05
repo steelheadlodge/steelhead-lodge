@@ -362,47 +362,54 @@ footer{background:#060f16;color:rgba(255,255,255,0.5);padding:3rem 2rem 2rem;}
       <!-- LIVE RIVER DATA -->
       <div>
         <p style="font-family:'Oswald',sans-serif;color:var(--gold);font-size:0.7rem;letter-spacing:0.3em;text-transform:uppercase;margin-bottom:1rem;">📡 Live River Conditions — USGS Pineville Gauge</p>
-        
-        <div style="background:rgba(255,255,255,0.04);border:1px solid rgba(212,168,67,0.2);border-radius:4px;padding:1.5rem;margin-bottom:1rem;">
-          <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:1rem;margin-bottom:1.25rem;">
+
+        <!-- CFS DISPLAY - loads from USGS -->
+        <div style="background:rgba(255,255,255,0.04);border:1px solid rgba(212,168,67,0.2);border-radius:4px;padding:1.25rem;margin-bottom:1rem;">
+          <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:1rem;margin-bottom:1rem;">
             <div style="text-align:center;">
-              <div id="cfs-value" style="font-family:'Playfair Display',serif;font-size:2.2rem;color:var(--gold);line-height:1;">--</div>
-              <div style="font-family:'Oswald',sans-serif;font-size:0.65rem;color:rgba(255,255,255,0.4);letter-spacing:0.15em;text-transform:uppercase;margin-top:4px;">CFS Flow</div>
+              <div id="cfs-value" style="font-family:'Playfair Display',serif;font-size:2rem;color:var(--gold);line-height:1;">--</div>
+              <div style="font-family:'Oswald',sans-serif;font-size:0.62rem;color:rgba(255,255,255,0.4);letter-spacing:0.12em;text-transform:uppercase;margin-top:4px;">CFS Flow</div>
             </div>
             <div style="text-align:center;">
-              <div id="gauge-value" style="font-family:'Playfair Display',serif;font-size:2.2rem;color:var(--gold);line-height:1;">--</div>
-              <div style="font-family:'Oswald',sans-serif;font-size:0.65rem;color:rgba(255,255,255,0.4);letter-spacing:0.15em;text-transform:uppercase;margin-top:4px;">Gauge (ft)</div>
+              <div id="gauge-value" style="font-family:'Playfair Display',serif;font-size:2rem;color:var(--gold);line-height:1;">--</div>
+              <div style="font-family:'Oswald',sans-serif;font-size:0.62rem;color:rgba(255,255,255,0.4);letter-spacing:0.12em;text-transform:uppercase;margin-top:4px;">Gauge (ft)</div>
             </div>
             <div style="text-align:center;">
-              <div id="temp-value" style="font-family:'Playfair Display',serif;font-size:2.2rem;color:var(--gold);line-height:1;">--</div>
-              <div style="font-family:'Oswald',sans-serif;font-size:0.65rem;color:rgba(255,255,255,0.4);letter-spacing:0.15em;text-transform:uppercase;margin-top:4px;">Water °F</div>
+              <div id="temp-value" style="font-family:'Playfair Display',serif;font-size:2rem;color:var(--gold);line-height:1;">--</div>
+              <div style="font-family:'Oswald',sans-serif;font-size:0.62rem;color:rgba(255,255,255,0.4);letter-spacing:0.12em;text-transform:uppercase;margin-top:4px;">Water °F</div>
             </div>
           </div>
-          <div id="updated-time" style="font-family:'Oswald',sans-serif;font-size:0.65rem;color:rgba(255,255,255,0.3);letter-spacing:0.1em;text-align:center;">Loading live data...</div>
+          <div id="updated-time" style="font-family:'Oswald',sans-serif;font-size:0.62rem;color:rgba(255,255,255,0.3);letter-spacing:0.08em;text-align:center;">
+            ⏳ Loading live data from USGS...
+          </div>
         </div>
 
         <!-- TUBING STATUS -->
-        <div id="tubing-status-box" style="border-radius:4px;padding:1.25rem;border:2px solid rgba(255,255,255,0.1);margin-bottom:1rem;">
+        <div id="tubing-status-box" style="border-radius:4px;padding:1.25rem;border:2px solid rgba(212,168,67,0.3);background:rgba(212,168,67,0.05);margin-bottom:1rem;">
           <div style="display:flex;align-items:center;gap:0.75rem;margin-bottom:0.5rem;">
             <span id="tubing-icon" style="font-size:1.8rem;">🛶</span>
             <div>
               <div style="font-family:'Oswald',sans-serif;font-size:0.7rem;letter-spacing:0.15em;text-transform:uppercase;color:rgba(255,255,255,0.5);margin-bottom:2px;">Tubing Conditions</div>
-              <div id="tubing-status" style="font-family:'Playfair Display',serif;font-size:1.3rem;color:white;">Loading...</div>
+              <div id="tubing-status" style="font-family:'Playfair Display',serif;font-size:1.3rem;color:var(--gold);">Check SafeWaters.com</div>
             </div>
           </div>
-          <div id="tubing-desc" style="font-family:'Crimson Pro',serif;font-size:0.95rem;color:rgba(255,255,255,0.6);font-style:italic;line-height:1.5;"></div>
+          <div id="tubing-desc" style="font-family:'Crimson Pro',serif;font-size:0.95rem;color:rgba(255,255,255,0.65);font-style:italic;line-height:1.6;">
+            Visit <a href="https://www.safewaters.com/facility/lighthouse-hill" target="_blank" style="color:var(--gold);">SafeWaters.com</a> for current dam release · <a href="https://waterdata.usgs.gov/monitoring-location/04249000/" target="_blank" style="color:var(--gold);">USGS Pineville Gauge</a> for live CFS · Or call <a href="tel:3152984371" style="color:var(--gold);">(315) 298-4371</a>
+          </div>
         </div>
 
         <!-- FISHING CONDITIONS -->
-        <div id="fishing-status-box" style="border-radius:4px;padding:1.25rem;border:2px solid rgba(255,255,255,0.1);">
+        <div id="fishing-status-box" style="border-radius:4px;padding:1.25rem;border:2px solid rgba(212,168,67,0.3);background:rgba(212,168,67,0.05);">
           <div style="display:flex;align-items:center;gap:0.75rem;margin-bottom:0.5rem;">
             <span id="fishing-icon" style="font-size:1.8rem;">🎣</span>
             <div>
               <div style="font-family:'Oswald',sans-serif;font-size:0.7rem;letter-spacing:0.15em;text-transform:uppercase;color:rgba(255,255,255,0.5);margin-bottom:2px;">Fishing Conditions</div>
-              <div id="fishing-status" style="font-family:'Playfair Display',serif;font-size:1.3rem;color:white;">Loading...</div>
+              <div id="fishing-status" style="font-family:'Playfair Display',serif;font-size:1.3rem;color:var(--gold);">See Today's Report</div>
             </div>
           </div>
-          <div id="fishing-desc" style="font-family:'Crimson Pro',serif;font-size:0.95rem;color:rgba(255,255,255,0.6);font-style:italic;line-height:1.5;"></div>
+          <div id="fishing-desc" style="font-family:'Crimson Pro',serif;font-size:0.95rem;color:rgba(255,255,255,0.65);font-style:italic;line-height:1.6;">
+            Read the <a href="https://douglastonsalmonrun.com/fishing-reports/" target="_blank" style="color:var(--gold);">DSR Daily Report</a> or <a href="https://fishingreports.orvis.com/northeast/new-york/salmon-river" target="_blank" style="color:var(--gold);">Orvis Report</a> for current conditions. Live data loads automatically when available.
+          </div>
         </div>
       </div>
 
@@ -438,16 +445,19 @@ footer{background:#060f16;color:rgba(255,255,255,0.5);padding:3rem 2rem 2rem;}
 
 
         <!-- RIVERREPORTS LIVE FLOW WIDGET -->
-        <div style="background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.08);border-radius:4px;overflow:hidden;margin-bottom:1rem;">
-          <div style="padding:0.6rem 1rem;background:rgba(255,255,255,0.04);border-bottom:1px solid rgba(255,255,255,0.06);">
-            <span style="font-family:'Oswald',sans-serif;color:rgba(255,255,255,0.5);font-size:0.65rem;letter-spacing:0.15em;text-transform:uppercase;">🌊 Live River Flow — RiverReports.com</span>
+        <div style="border:1px solid rgba(212,168,67,0.3);border-radius:4px;overflow:hidden;margin-bottom:1rem;">
+          <div style="padding:0.6rem 1rem;background:rgba(13,32,48,0.8);border-bottom:1px solid rgba(212,168,67,0.2);display:flex;justify-content:space-between;align-items:center;">
+            <span style="font-family:'Oswald',sans-serif;color:var(--gold);font-size:0.65rem;letter-spacing:0.15em;text-transform:uppercase;">🌊 Live River Flow — Salmon River at Pineville</span>
+            <a href="https://waterdata.usgs.gov/monitoring-location/04249000/" target="_blank" style="font-family:'Oswald',sans-serif;color:rgba(255,255,255,0.4);font-size:0.6rem;letter-spacing:0.1em;text-transform:uppercase;text-decoration:none;">USGS Data →</a>
           </div>
-          <iframe
-            src="https://riverreports.com/states/ny/sites/bce0bfb7-461c-4dd7-8cc9-45ad4c007b94/embed"
-            style="width:100%;height:200px;border:none;display:block;"
-            title="Salmon River Live Flow Data"
-            loading="lazy">
-          </iframe>
+          <div style="background:white;padding:0;">
+            <iframe
+              src="https://riverreports.com/states/ny/sites/bce0bfb7-461c-4dd7-8cc9-45ad4c007b94/embed"
+              style="width:100%;height:220px;border:none;display:block;background:white;"
+              title="Salmon River Live Flow Data"
+              loading="lazy">
+            </iframe>
+          </div>
         </div>
 
         <!-- EXTERNAL LINKS ROW -->
