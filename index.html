@@ -397,7 +397,7 @@ footer{background:#060f16;color:rgba(255,255,255,0.5);padding:3rem 2rem 2rem;}
             </div>
           </div>
           <div id="tubing-desc" style="font-family:'Crimson Pro',serif;font-size:0.95rem;color:rgba(255,255,255,0.65);font-style:italic;line-height:1.6;">
-            Visit <a href="https://www.safewaters.com/facility/lighthouse-hill" target="_blank" style="color:var(--gold);">SafeWaters.com</a> for current dam release · <a href="https://waterdata.usgs.gov/monitoring-location/04249000/" target="_blank" style="color:var(--gold);">USGS Pineville Gauge</a> for live CFS · Or call <a href="tel:3152984371" style="color:var(--gold);">(315) 298-4371</a>
+            Visit <a href="https://www.safewaters.com/facility/lighthouse-hill" target="_blank" style="color:var(--gold);">SafeWaters.com</a> for current dam release · <a href="https://waterdata.usgs.gov/monitoring-location/USGS-04250200/" target="_blank" style="color:var(--gold);">USGS Pineville Gauge</a> for live CFS · Or call <a href="tel:3152984371" style="color:var(--gold);">(315) 298-4371</a>
           </div>
         </div>
 
@@ -451,7 +451,7 @@ footer{background:#060f16;color:rgba(255,255,255,0.5);padding:3rem 2rem 2rem;}
         <div style="border:1px solid rgba(212,168,67,0.3);border-radius:4px;overflow:hidden;margin-bottom:1rem;">
           <div style="padding:0.6rem 1rem;background:rgba(13,32,48,0.8);border-bottom:1px solid rgba(212,168,67,0.2);display:flex;justify-content:space-between;align-items:center;">
             <span style="font-family:'Oswald',sans-serif;color:var(--gold);font-size:0.65rem;letter-spacing:0.15em;text-transform:uppercase;">🌊 Live River Flow — Salmon River at Pineville</span>
-            <a href="https://waterdata.usgs.gov/monitoring-location/04249000/" target="_blank" style="font-family:'Oswald',sans-serif;color:rgba(255,255,255,0.4);font-size:0.6rem;letter-spacing:0.1em;text-transform:uppercase;text-decoration:none;">USGS Data →</a>
+            <a href="https://waterdata.usgs.gov/monitoring-location/USGS-04250200/" target="_blank" style="font-family:'Oswald',sans-serif;color:rgba(255,255,255,0.4);font-size:0.6rem;letter-spacing:0.1em;text-transform:uppercase;text-decoration:none;">USGS Data →</a>
           </div>
           <div style="background:white;padding:0;">
             <iframe
@@ -485,7 +485,7 @@ footer{background:#060f16;color:rgba(255,255,255,0.5);padding:3rem 2rem 2rem;}
                onmouseout="this.style.borderColor='rgba(255,255,255,0.08)';this.style.color='rgba(255,255,255,0.6)'">
               💧 SafeWaters Dam Release →
             </a>
-            <a href="https://waterdata.usgs.gov/monitoring-location/04249000/" target="_blank"
+            <a href="https://waterdata.usgs.gov/monitoring-location/USGS-04250200/" target="_blank"
                style="font-family:'Oswald',sans-serif;font-size:0.7rem;color:rgba(255,255,255,0.6);text-decoration:none;letter-spacing:0.08em;text-transform:uppercase;padding:0.5rem 0.75rem;background:rgba(255,255,255,0.04);border-radius:2px;border:1px solid rgba(255,255,255,0.08);display:block;transition:all 0.2s;"
                onmouseover="this.style.borderColor='rgba(212,168,67,0.4)';this.style.color='var(--gold)'"
                onmouseout="this.style.borderColor='rgba(255,255,255,0.08)';this.style.color='rgba(255,255,255,0.6)'">
@@ -523,57 +523,51 @@ footer{background:#060f16;color:rgba(255,255,255,0.5);padding:3rem 2rem 2rem;}
 
 <script>
 // ─── USGS LIVE DATA ───────────────────────────────────────────
-// Salmon River at Pineville gauge: 04249000
+// Salmon River at Pineville gauge: 04250200
 async function loadUSGSData() {
+  let cfs = null, gaugeHt = null, tempC = null;
+
   try {
-    // USGS Instantaneous Values API - works from browsers with CORS
-    // Trying multiple URL formats for best compatibility
-    const endpoints = [
-      'https://waterservices.usgs.gov/nwis/iv/?format=json&sites=04249000&parameterCd=00060,00065,00010&siteStatus=all',
-      'https://waterservices.usgs.gov/nwis/iv/?format=json&sites=04249000&parameterCd=00060,00065&siteStatus=all',
-      'https://waterservices.usgs.gov/nwis/iv/?format=json&sites=04249000&parameterCd=00060&siteStatus=all'
+    // USGS Gauge 04250200 - Salmon River at Pineville NY
+    // Legacy API supports CORS from browsers (confirmed by USGS docs)
+    const urls = [
+      'https://waterservices.usgs.gov/nwis/iv/?format=json&sites=04250200&parameterCd=00060,00065,00010&siteStatus=all',
+      'https://waterservices.usgs.gov/nwis/iv/?format=json&sites=04250200&parameterCd=00060,00065&siteStatus=all',
+      'https://waterservices.usgs.gov/nwis/iv/?format=json&sites=04250200&parameterCd=00060&siteStatus=all',
     ];
 
     let data = null;
-    let lastError = null;
 
-    for (const url of endpoints) {
+    for (const url of urls) {
       try {
         const ctrl = new AbortController();
-        const timeout = setTimeout(() => ctrl.abort(), 8000); // 8 second timeout
-        const response = await fetch(url, {
-          signal: ctrl.signal,
-          cache: 'no-cache'
-        });
+        const timeout = setTimeout(() => ctrl.abort(), 10000);
+        const res = await fetch(url, { signal: ctrl.signal, cache: 'no-cache' });
         clearTimeout(timeout);
-        if (response.ok) {
-          data = await response.json();
-          if (data && data.value && data.value.timeSeries) break;
-          data = null;
+        if (res.ok) {
+          const json = await res.json();
+          if (json && json.value && json.value.timeSeries && json.value.timeSeries.length > 0) {
+            data = json;
+            break;
+          }
         }
-      } catch(e) {
-        lastError = e;
-        continue;
-      }
+      } catch(e) { continue; }
     }
 
-    if (!data) throw new Error(lastError || 'No data returned');
+    if (!data) throw new Error('No data from any endpoint');
 
-    const series = data.value.timeSeries;
-    let cfs = null, gaugeHt = null, tempC = null;
-
-    series.forEach(s => {
+    data.value.timeSeries.forEach(s => {
       const code = s.variable.variableCode[0].value;
-      const values = s.values[0].value;
-      if (!values || values.length === 0) return;
-      const val = parseFloat(values[0].value);
-      if (isNaN(val)) return;
-      if (code === '00060') cfs = val;
-      if (code === '00065') gaugeHt = val;
-      if (code === '00010') tempC = val;
+      const vals = s.values[0].value;
+      if (!vals || vals.length === 0) return;
+      const v = parseFloat(vals[0].value);
+      if (isNaN(v) || v < 0) return;
+      if (code === '00060') cfs = v;
+      if (code === '00065') gaugeHt = v;
+      if (code === '00010') tempC = v;
     });
 
-    if (cfs !== null && cfs >= 0) {
+    if (cfs !== null) {
       document.getElementById('cfs-value').textContent = Math.round(cfs).toLocaleString();
       document.getElementById('cfs-value').style.color = 'var(--gold)';
       updateTubingStatus(cfs);
@@ -581,48 +575,39 @@ async function loadUSGSData() {
     }
     if (gaugeHt !== null) {
       document.getElementById('gauge-value').textContent = gaugeHt.toFixed(1);
+      document.getElementById('gauge-value').style.color = 'var(--gold)';
     }
     if (tempC !== null) {
       const tempF = ((tempC * 9/5) + 32).toFixed(1);
       document.getElementById('temp-value').textContent = tempF + '°';
+      document.getElementById('temp-value').style.color = 'var(--gold)';
     }
 
     const now = new Date();
     document.getElementById('updated-time').textContent =
       '🟢 Live · Updated ' + now.toLocaleTimeString('en-US', {hour:'numeric', minute:'2-digit'}) +
-      ' · USGS Gauge 04249000 Pineville';
+      ' · USGS Gauge 04250200 Pineville';
 
   } catch(err) {
-    // On error show a helpful message and use a reasonable default
-    console.warn('USGS data unavailable:', err);
+    console.warn('USGS load failed:', err);
     document.getElementById('updated-time').textContent =
-      '⚠️ Live data temporarily unavailable · Check safewaters.com or call (315) 298-4371';
-    
-    // Try to at least show tubing/fishing status based on typical spring flows
-    // so the widget is still useful even without live data
-    const el = document.getElementById('cfs-value');
-    if (el) el.textContent = 'N/A';
-    
-    // Show helpful fallback status
-    const tubingBox = document.getElementById('tubing-status-box');
+      '⚠️ Live data unavailable · View at waterdata.usgs.gov · Call (315) 298-4371';
+
     const tubingStatus = document.getElementById('tubing-status');
     const tubingDesc = document.getElementById('tubing-desc');
-    if (tubingBox && tubingStatus) {
+    const tubingBox = document.getElementById('tubing-status-box');
+    if (tubingStatus) {
       tubingBox.style.borderColor = 'rgba(212,168,67,0.3)';
-      tubingBox.style.background = 'rgba(212,168,67,0.05)';
       tubingStatus.textContent = 'Check Current Flow';
       tubingStatus.style.color = 'var(--gold)';
-      if (tubingDesc) tubingDesc.innerHTML = 'Visit <a href="https://www.safewaters.com/facility/lighthouse-hill" target="_blank" style="color:var(--gold);">SafeWaters.com</a> for current dam release · <a href="https://waterdata.usgs.gov/monitoring-location/04249000/" target="_blank" style="color:var(--gold);">USGS Pineville Gauge</a> for live CFS · Or call us at <a href="tel:3152984371" style="color:var(--gold);">(315) 298-4371</a>';
+      tubingDesc.innerHTML = 'Visit <a href="https://waterdata.usgs.gov/monitoring-location/USGS-04250200/" target="_blank" style="color:var(--gold);">USGS Pineville Gauge</a> · <a href="https://www.safewaters.com/facility/lighthouse-hill" target="_blank" style="color:var(--gold);">SafeWaters.com</a> · or call <a href="tel:3152984371" style="color:var(--gold);">(315) 298-4371</a>';
     }
-    const fishingBox = document.getElementById('fishing-status-box');
     const fishingStatus = document.getElementById('fishing-status');
     const fishingDesc = document.getElementById('fishing-desc');
-    if (fishingBox && fishingStatus) {
-      fishingBox.style.borderColor = 'rgba(212,168,67,0.3)';
-      fishingBox.style.background = 'rgba(212,168,67,0.05)';
+    if (fishingStatus) {
       fishingStatus.textContent = 'See Today's Report';
       fishingStatus.style.color = 'var(--gold)';
-      if (fishingDesc) fishingDesc.innerHTML = 'Read the <a href="https://douglastonsalmonrun.com/fishing-reports/" target="_blank" style="color:var(--gold);">DSR Daily Fishing Report</a> or <a href="https://fishingreports.orvis.com/northeast/new-york/salmon-river" target="_blank" style="color:var(--gold);">Orvis Salmon River Report</a> for current conditions.';
+      fishingDesc.innerHTML = '<a href="https://douglastonsalmonrun.com/fishing-reports/" target="_blank" style="color:var(--gold);">DSR Daily Report</a> · <a href="https://fishingreports.orvis.com/northeast/new-york/salmon-river" target="_blank" style="color:var(--gold);">Orvis Report</a>';
     }
   }
 }
