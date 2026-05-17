@@ -428,7 +428,7 @@ footer{background:#060f16;color:rgba(255,255,255,0.5);padding:3rem 2rem 2rem;}
               <span style="font-size:1.2rem;">🎣</span>
               <div>
                 <div style="font-family:'Oswald',sans-serif;color:white;font-size:0.8rem;letter-spacing:0.05em;text-transform:uppercase;">Orvis Salmon River Report</div>
-                <div style="font-family:'Oswald',sans-serif;color:rgba(255,255,255,0.35);font-size:0.62rem;letter-spacing:0.08em;text-transform:uppercase;">by Whitakers · Updated Weekly</div>
+                <div style="font-family:'Oswald',sans-serif;color:rgba(255,255,255,0.35);font-size:0.62rem;letter-spacing:0.08em;text-transform:uppercase;">by Whitakers · Updated Daily</div>
               </div>
             </div>
             <a href="https://fishingreports.orvis.com/northeast/new-york/salmon-river" target="_blank"
@@ -436,12 +436,12 @@ footer{background:#060f16;color:rgba(255,255,255,0.5);padding:3rem 2rem 2rem;}
               Read Full Report →
             </a>
           </div>
-          <!-- Latest Orvis snippet — update this text when you tell me to -->
+          <!-- Auto-loaded from Whitakers daily report feed — falls back to hardcoded text if unavailable -->
           <p id="orvis-snippet" style="font-family:'Crimson Pro',serif;font-size:1rem;color:rgba(255,255,255,0.75);line-height:1.75;font-style:italic;border-left:3px solid var(--gold);padding-left:0.75rem;margin-bottom:0.75rem;">
-            "Drop backs scattered throughout the river top to bottom. Upper end still holds some spawning steelhead. Smallmouth bass showing in the lower sections. Covering lots of water has been key — deeper holes and larger runs producing best action. Swinging streamers with sinking leaders or dead drifting egg patterns working well."
+            "The majority of steelhead have finished the spawning process and headed back to Lake Ontario. Best bet for remaining steelhead is the lower end of the river — also your best shot at smallmouth bass. Fly fishing: swinging streamers with sinking leaders or dead drifting egg patterns producing steady results. Bottom bouncing or float fishing: egg sacs, beads, and pink worms all working."
           </p>
-          <div style="font-family:'Oswald',sans-serif;font-size:0.62rem;color:rgba(255,255,255,0.3);letter-spacing:0.08em;text-transform:uppercase;">
-            Water Temp: 54°F · Last Updated: April 28, 2026 · Source: Orvis / Whitakers
+          <div id="report-meta" style="font-family:'Oswald',sans-serif;font-size:0.62rem;color:rgba(255,255,255,0.3);letter-spacing:0.08em;text-transform:uppercase;">
+            Water Temp: 52°F · Last Updated: May 12, 2026 · Source: Whitakers Sports Store
           </div>
         </div>
 
@@ -731,6 +731,56 @@ highlightIfSoon('ww3', ww3Start);
 // Load data on page load, refresh every 15 minutes
 loadUSGSData();
 setInterval(loadUSGSData, 15 * 60 * 1000);
+
+// ─── WHITAKERS DAILY REPORT (AUTO) ───────────────────────────
+async function loadWhitakersReport() {
+  try {
+    const ctrl = new AbortController();
+    const timeout = setTimeout(() => ctrl.abort(), 8000);
+    const res = await fetch('https://whitakers.com/blogs/daily-report.atom', {
+      signal: ctrl.signal,
+      cache: 'no-cache'
+    });
+    clearTimeout(timeout);
+    if (!res.ok) throw new Error('Feed unavailable');
+
+    const xml = await res.text();
+    const doc = new DOMParser().parseFromString(xml, 'application/xml');
+    const entry = doc.querySelector('entry');
+    if (!entry) throw new Error('No entries in feed');
+
+    // Get content and strip HTML tags
+    const rawContent = entry.querySelector('content')?.textContent
+                    || entry.querySelector('summary')?.textContent
+                    || '';
+    const tmp = document.createElement('div');
+    tmp.innerHTML = rawContent;
+    const text = (tmp.textContent || tmp.innerText || '').trim().replace(/\s+/g, ' ');
+    if (!text) throw new Error('Empty content');
+
+    // Trim to a readable length
+    const snippet = text.length > 450 ? text.slice(0, 450).replace(/\s\S+$/, '') + '…' : text;
+
+    // Get published date
+    const published = entry.querySelector('published')?.textContent || '';
+    const dateStr = published
+      ? new Date(published).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })
+      : '';
+
+    // Update the DOM
+    const snippetEl = document.getElementById('orvis-snippet');
+    const metaEl = document.getElementById('report-meta');
+    if (snippetEl) snippetEl.textContent = '“' + snippet + '”';
+    if (metaEl && dateStr) {
+      metaEl.textContent = 'Last Updated: ' + dateStr + ' · Source: Whitakers Sports Store · Auto-Updated Daily';
+    }
+  } catch(e) {
+    // Silently fall back to hardcoded text — no visible error shown
+    console.warn('Whitakers feed load failed:', e.message);
+  }
+}
+
+loadWhitakersReport();
 </script>
 
 <section class="about" id="about">
