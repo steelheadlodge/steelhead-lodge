@@ -531,9 +531,9 @@ async function loadUSGSData() {
     // USGS Gauge 04250200 - Salmon River at Pineville NY
     // Legacy API supports CORS from browsers (confirmed by USGS docs)
     const urls = [
+      'https://waterservices.usgs.gov/nwis/iv/?format=json&sites=04250200&parameterCd=00060,00065,00010&siteStatus=all',
       'https://blue-credit-9b6b.spcecwby.workers.dev',
       'https://waterservices.usgs.gov/nwis/iv/?format=json&sites=04250200&parameterCd=00060,00065&siteStatus=all',
-      'https://waterservices.usgs.gov/nwis/iv/?format=json&sites=04250200&parameterCd=00060&siteStatus=all',
     ];
 
     let data = null;
