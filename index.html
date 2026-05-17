@@ -734,65 +734,43 @@ setInterval(loadUSGSData, 15 * 60 * 1000);
 
 // ─── WHITAKERS DAILY REPORT + WATER TEMP (AUTO) ──────────────
 async function loadWhitakersReport() {
-
-  // 1) Pull water temp from the Whitakers daily report page
+  // Single call through Cloudflare Worker (bypasses CORS)
   try {
     const ctrl = new AbortController();
-    setTimeout(() => ctrl.abort(), 6000);
-    const res = await fetch('https://whitakers.com/blogs/daily-report', {
+    setTimeout(() => ctrl.abort(), 10000);
+    const res = await fetch('https://whitakers-temp.spcecwby.workers.dev/', {
       signal: ctrl.signal, cache: 'no-cache'
     });
-    if (res.ok) {
-      const html = await res.text();
-      const match = html.match(/Water\s+Temp\s+(\d+)\s*F/i);
-      if (match) {
-        const el = document.getElementById('temp-value');
-        if (el) {
-          el.textContent = match[1] + '°';
-          el.style.color = 'var(--gold)';
-        }
+    if (!res.ok) throw new Error('Worker unavailable');
+    const data = await res.json();
+
+    // Water temp
+    if (data.tempF) {
+      const el = document.getElementById('temp-value');
+      if (el) {
+        el.textContent = data.tempF + '°';
+        el.style.color = 'var(--gold)';
       }
     }
-  } catch(e) {
-    console.warn('Whitakers temp fetch failed:', e.message);
-  }
 
-  // 2) Pull latest report text from Whitakers Atom feed
-  try {
-    const ctrl2 = new AbortController();
-    setTimeout(() => ctrl2.abort(), 8000);
-    const res2 = await fetch('https://whitakers.com/blogs/daily-report.atom', {
-      signal: ctrl2.signal, cache: 'no-cache'
-    });
-    if (!res2.ok) throw new Error('Feed unavailable');
+    // Fishing report snippet
+    if (data.reportText) {
+      const snippetEl = document.getElementById('orvis-snippet');
+      if (snippetEl) snippetEl.textContent = '”' + data.reportText + '”';
+    }
 
-    const xml = await res2.text();
-    const doc = new DOMParser().parseFromString(xml, 'application/xml');
-    const entry = doc.querySelector('entry');
-    if (!entry) throw new Error('No entries in feed');
-
-    const rawContent = entry.querySelector('content')?.textContent
-                    || entry.querySelector('summary')?.textContent || '';
-    const tmp = document.createElement('div');
-    tmp.innerHTML = rawContent;
-    const text = (tmp.textContent || tmp.innerText || '').trim().replace(/\s+/g, ' ');
-    if (!text) throw new Error('Empty content');
-
-    const snippet = text.length > 450 ? text.slice(0, 450).replace(/\s\S+$/, '') + '…' : text;
-
-    const published = entry.querySelector('published')?.textContent || '';
-    const dateStr = published
-      ? new Date(published).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })
-      : '';
-
-    const snippetEl = document.getElementById('orvis-snippet');
+    // Meta line
     const metaEl = document.getElementById('report-meta');
-    if (snippetEl) snippetEl.textContent = '”' + snippet + '”';
-    if (metaEl && dateStr) {
-      metaEl.textContent = 'Last Updated: ' + dateStr + ' · Source: Whitakers Sports Store · Auto-Updated Daily';
+    if (metaEl) {
+      const dateStr = data.reportDate
+        ? new Date(data.reportDate).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })
+        : '';
+      const tempPart = data.tempF ? 'Water Temp: ' + data.tempF + '°F · ' : '';
+      const datePart = dateStr ? 'Last Updated: ' + dateStr + ' · ' : '';
+      metaEl.textContent = tempPart + datePart + 'Source: Whitakers Sports Store · Auto-Updated Daily';
     }
   } catch(e) {
-    console.warn('Whitakers feed load failed:', e.message);
+    console.warn('Whitakers worker fetch failed:', e.message);
   }
 }
 
