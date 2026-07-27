@@ -273,31 +273,31 @@ section{padding:6rem 2rem;}
 .packages .section-title{color:white;}
 .packages .section-intro{color:rgba(255,255,255,0.65);}
 .packages .section-label{color:var(--gold);}
-.packages-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:1.25rem;}
-.package-card{background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1);border-radius:4px;padding:1.75rem;position:relative;transition:all 0.3s;}
-.package-card.featured{background:var(--cream);border-color:var(--gold);transform:scale(1.03);}
+.packages-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:1.25rem;align-items:stretch;}
+.package-card{background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1);border-radius:4px;padding:2.5rem 1.75rem 1.75rem;position:relative;transition:background 0.3s,border-color 0.3s,box-shadow 0.3s;display:flex;flex-direction:column;height:100%;box-sizing:border-box;}
+.package-card.featured{background:var(--cream);border-color:var(--gold);box-shadow:0 10px 28px rgba(0,0,0,0.28);}
 .package-card.tubing-pkg{background:rgba(26,122,74,0.15);border-color:rgba(26,200,100,0.3);}
 .package-card:hover:not(.featured){background:rgba(255,255,255,0.1);}
-.package-badge{position:absolute;top:1rem;right:1rem;background:var(--ember);color:white;font-family:'Oswald',sans-serif;font-size:0.6rem;letter-spacing:0.15em;text-transform:uppercase;padding:0.25rem 0.6rem;border-radius:2px;}
+.package-badge{position:absolute;top:0.85rem;right:0.85rem;background:var(--ember);color:white;font-family:'Oswald',sans-serif;font-size:0.6rem;letter-spacing:0.15em;text-transform:uppercase;padding:0.25rem 0.6rem;border-radius:2px;z-index:1;}
 .package-badge.new-badge{background:#1a7a4a;}
-.package-card h3{font-family:'Playfair Display',serif;font-size:1.25rem;margin-bottom:0.4rem;}
+.package-card h3{font-family:'Playfair Display',serif;font-size:1.25rem;line-height:1.25;min-height:2.5rem;margin:0 0 0.4rem;padding-right:4.5rem;}
 .package-card:not(.featured) h3{color:white;}
 .package-card.featured h3{color:var(--river);}
-.pkg-nights{font-family:'Oswald',sans-serif;font-size:0.72rem;letter-spacing:0.1em;text-transform:uppercase;margin-bottom:1.25rem;}
+.pkg-nights{font-family:'Oswald',sans-serif;font-size:0.72rem;letter-spacing:0.1em;text-transform:uppercase;margin:0 0 1.25rem;min-height:1rem;}
 .package-card:not(.featured) .pkg-nights{color:rgba(255,255,255,0.4);}
 .package-card.featured .pkg-nights{color:var(--light-text);}
-.pkg-includes{list-style:none;margin-bottom:1.25rem;}
+.pkg-includes{list-style:none;margin:0 0 1.25rem;flex:1 1 auto;}
 .pkg-includes li{padding:0.32rem 0;font-size:0.9rem;border-bottom:1px solid rgba(255,255,255,0.06);}
 .package-card:not(.featured) .pkg-includes li{color:rgba(255,255,255,0.7);}
 .package-card.featured .pkg-includes li{color:var(--light-text);border-color:rgba(26,58,74,0.1);}
 .pkg-includes li::before{content:'✓ ';color:var(--gold);}
-.pkg-price{margin-bottom:1.25rem;}
-.pkg-price .price{font-family:'Playfair Display',serif;font-size:1.8rem;color:var(--gold);}
+.pkg-price{margin:0 0 1rem;}
+.pkg-price .price{font-family:'Playfair Display',serif;font-size:1.8rem;line-height:1.2;color:var(--gold);}
 .package-card.featured .pkg-price .price{color:var(--ember);}
 .pkg-price .per{font-size:0.85rem;font-family:'Crimson Pro',serif;}
 .package-card:not(.featured) .pkg-price .per{color:rgba(255,255,255,0.4);}
 .package-card.featured .pkg-price .per{color:var(--light-text);}
-.btn-book{display:block;text-align:center;background:var(--ember);color:white;padding:0.75rem;border-radius:2px;font-family:'Oswald',sans-serif;font-size:0.75rem;letter-spacing:0.15em;text-transform:uppercase;text-decoration:none;transition:all 0.25s;}
+.btn-book{display:block;text-align:center;background:var(--ember);color:white;padding:0.75rem;border-radius:2px;font-family:'Oswald',sans-serif;font-size:0.75rem;letter-spacing:0.15em;text-transform:uppercase;text-decoration:none;transition:background 0.25s;margin-top:auto;}
 .btn-book:hover{background:#e05e0a;}
 .package-card:not(.featured) .btn-book{background:rgba(200,82,10,0.65);}
 .package-card:not(.featured) .btn-book:hover{background:var(--ember);}
@@ -373,7 +373,6 @@ footer{background:#060f16;color:rgba(255,255,255,0.5);padding:3rem 2rem 2rem;}
   .room-card.featured-room{grid-column:span 1;display:block;}
   .seasons-grid{grid-template-columns:1fr 1fr;}
   .packages-grid{grid-template-columns:1fr 1fr;}
-  .package-card.featured{transform:none;}
   .activities-grid{grid-template-columns:1fr 1fr;}
   .reviews-grid,.footer-grid{grid-template-columns:1fr;}
   .gallery-grid{grid-template-columns:1fr 1fr;}
